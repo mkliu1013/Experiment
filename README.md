@@ -48,9 +48,6 @@ After 60 questions are done, close page will show. Click close button, csv file 
 -Hovering effect when hover the buttons.
 
 
-## General Requirements
-
-
 
 
 
