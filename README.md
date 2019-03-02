@@ -31,6 +31,10 @@ After 60 questions are done, close page will show. Click close button, csv file 
 
 ![close](img/Close.png)
 
+Implementing gdata in R to do the confidence interval calculation.
+![CI](img/CI.png)
+
+The final results are same to Cleveland and McGill's finding. Bar chart with lowest error, then pie chart and treemap.
 
 ## Technical
 
