@@ -32,9 +32,16 @@ After 60 questions are done, close page will show. Click close button, csv file 
 ![close](img/Close.png)
 
 
-Requirements
----
+## Technical
 
+-Using jquery to realize page update.
+-Progress alert is updated automatically to let participants know how many questions they have finished.
+-Using Adobe Illustrator and Photoshop to make gif for dynamic instruction.
+-CSV file is automatically written after each test.
+
+## Design
+-Color Scheme
+![Color](img/Color Scheme.png)
 
 ## General Requirements
 
