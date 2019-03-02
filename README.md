@@ -14,7 +14,7 @@ For the flow of design, the first page is the welcome page, it indroduces the ex
 
 Jquery is used to realize updating pages. The Instruction page is used to introduce how to conduct the experiment to participants by GIF. With dynamic instruction, it can help participants to understand the rules easily.
 
-![instruction](img/Sample.gif)
+![instruction](img/Instruction.png)
 
 After starting the experiment,bar chart, pie chart and treemap will show randomly, each chart will appear 20 times for testing. Progress will be shown on the top of the right to let participants know how many trials they have already finished.
 
