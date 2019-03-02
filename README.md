@@ -25,7 +25,7 @@ After starting the experiment,bar chart, pie chart and treemap will show randoml
 If answer is empty or beyond the 100, alert window will be pop up.
 
 ![empty](img/empty answer alert.png)
-![beyong](img/beyond 100 alert.png)
+![beyond](img/Beyond 100 alert.png)
 
 Requirements
 ---
