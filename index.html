@@ -1,13 +1,420 @@
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Experiment</title>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    body{
+      background-color:#EDF7F5;
+    }
+    .title{
+      text-aligh:center;
+      font-family: Source Sans Pro;
+      color:#204E5F;
+    }
 
-<style>
-</style>
+    .text{
+      text-aligh:center;
+      font-family: Myriad Pro;
+      color:#204E5F;
+    }
 
+    .disagreeBtn{
+      background-color:#204E5F;
+      color:white;
+      padding: 12px 28px;
+      font-size:16px;
+      border-radius: 18px;
+    }
+    .agreeBtn{
+      background-color:#FF8984;
+      color:white;
+      padding: 12px 28px;
+      font-size:16px;
+      border-radius: 18px;
+    }
+    .startBtn{
+      background-color:#FF8984;
+      color:white;
+      padding: 12px 28px;
+      font-size:16px;
+      border-radius: 18px;
+    }
+    .nextBtn{
+      background-color:#FFC6A8;
+      color:white;
+      padding: 12px 28px;
+      font-size:16px;
+      border-radius: 18px;
+    }
+    .closeBtn{
+      background-color:#204E5F;
+      color:white;
+      padding: 12px 28px;
+      font-size:16px;
+      border-radius: 18px;
+    }
+
+    .disagreeBtn:hover,.agreeBtn:hover,.startBtn:hover,.nextBtn:hover,.closeBtn:hover{
+      color:#B7D7D8;
+      background-color:#393E46;
+    }
+  </style>
+</head>
 <body>
-  <h1> Experiment </h1>
-</body>
+<div style="text-align: center;">
+  <div id="pagination" style="text-align: right">0/60</div>
+  <div id="welcomeView" style="text-align: center">
+    <h1 class="title">Visualization Experiment</h1>
+    <p class="text">In this experiment,</p>
+    <p class="text">you are asked to judge</p>
+    <p class="text">what is the percentage of a smaller value to a large value in several charts</p>
+    <br>
+    <p class="text">We don't record any other information from you except your answers.</p>
+    <p class="text">Click the "agree" button to begin.</p>
+    <br>
+    <p class="text">Thanks you!</p>
+    <br>
+    <br>
+    <button type="button" name="disagree" class="disagreeBtn"id="disagreeButton">DISAGREE</button>
+    <br>
+    <br>
+    <button type="button" name="agree" class="agreeBtn" id="agreeButton">AGREE</button>
+  </div>
+
+  <div id="demoView" style="align:center; display:none">
+    <h1 class="title">Please follow the instruction below</h1>
+    <p class="text">If you are ready, click START button</p>
+    <img src="https://media.giphy.com/media/5eF8DVAVHnUAKhxt4m/giphy.gif" alt="demo">
+    <br>
+    <br>
+    <button type="button" name="start" class="startBtn" id="startButton">START</button>
+  </div>
+
+  <div id="questionView" style="text-align: center;display: none">
+    <div id="chart"></div>
+    <p class="text">Two values are marked with dots.</p>
+    <p class="text">What do you think the percent of the samller value to the larger value?</p>
+    <p class="text">Please put your answer below.</p>
+    <p class="text">e.g. If you think the smaller one is exactly a half of the bigger one.</p>
+    <p class="text">please input "50".</p>
+    <div id="textBox" style="display: inline-block">
+      <label>ANSWER<input type="text" name="answer"  id="answer"></label>
+      <button type="button" name="next" class="nextBtn" id="nextButton">NEXT</button>
+    </div>
+  </div>
+
+  <div id="closeView" style="text-align: center;display: none">
+    <h1 class="title">Thanks!</h1>
+    <br>
+    <button type="button" name="close" class="closeBtn" id="closeButton">CLOSE</button>
+  </div>
+</div>
 
 <script>
-  console.log(d3); // test if d3 is loaded
+  // pagination
+  let currentPage = 0
+
+  // initialize all types of chart
+  let types = []
+
+  for (let i = 0; i < 20; i++) {
+    types.push('pie')
+    types.push('bar')
+    types.push('treemap')
+  }
+
+  const WIDTH = 600
+  const HEIGHT = 400
+
+  let answers = []
+
+  let currentRatio = 0
+  let currentType = ""
+
+  function updatePagination() {
+    currentPage++
+    $('#pagination').text(currentPage + "/60")
+  }
+
+  $('#disagreeButton').click(function() {
+    alert("Bye!")
+    window.close()
+  })
+
+  $('#agreeButton').click(function() {
+    $('#welcomeView').hide()
+    $('#demoView').show()
+  })
+
+  $('#startButton').click(function() {
+    updatePagination()
+
+    let data = getRandomDataPoints()
+
+    let picked = pickRandomIndexes(data)
+
+    let type = getRandomType()
+
+    let pickedValue = [data[picked[0]], data[picked[1]]]
+
+    currentRatio = Math.floor((Math.min(...pickedValue) / Math.max(...pickedValue)) * 100)
+
+    currentType = type
+
+    if (type == "bar") {
+      drawBar(data, picked[0], picked[1])
+    }
+    if (type == "pie") {
+      drawPie(data, picked[0], picked[1])
+    }
+    if (type == "treemap") {
+      drawTreemap(data, picked[0], picked[1])
+    }
+
+    $('#demoView').hide()
+    $('#questionView').show()
+  })
+
+  $('#nextButton').click(function() {
+    if ($('#answer').val() == "") {
+      alert("Please answer the question")
+      return
+    }
+
+    let answer = parseInt($('#answer').val())
+
+    if ((answer <= 0 || answer > 100)) {
+      alert("Answer has to be a percentage between 0-100")
+      return
+    }
+
+    answers.push([currentType, currentRatio, answer])
+
+    updatePagination()
+
+    if (currentPage > 60) {
+      $('#questionView').hide()
+      $('#pagination').hide()
+      $('#closeView').show()
+      return
+    }
+
+    $('#chart').empty()
+
+    let data = getRandomDataPoints()
+
+    let picked = pickRandomIndexes(data)
+
+    let type = getRandomType()
+
+    let pickedValue = [data[picked[0]], data[picked[1]]]
+
+    currentRatio = Math.floor((Math.min(...pickedValue) / Math.max(...pickedValue)) * 100)
+
+    currentType = type
+
+    if (type == "bar") {
+      drawBar(data, picked[0], picked[1])
+    }
+    if (type == "pie") {
+      drawPie(data, picked[0], picked[1])
+    }
+    if (type == "treemap") {
+      drawTreemap(data, picked[0], picked[1])
+    }
+  })
+
+
+  $('#closeButton').click(function() {
+    writeCsv('result.csv')
+  })
+
+  function getRandomType() {
+    let randIndex = Math.floor(Math.random() * types.length)
+    let type = types[randIndex]
+    types.splice(randIndex, 1)
+    return type
+  }
+
+  function getRandomDataPoints() {
+    let dataset = []
+    for (let i = 0; i < 10; i++) {
+      let point = 0
+
+      while(point < 1) {
+        point = Math.floor(Math.random() * 100)
+      }
+
+      dataset.push(point)
+    }
+    return dataset
+  }
+
+  function pickRandomIndexes(data) {
+    let randomIndex1 = Math.floor(Math.random() * data.length)
+
+    let randomIndex2 = Math.floor(Math.random() * data.length)
+
+    while(randomIndex1 == randomIndex2) {
+      randomIndex2 = Math.floor(Math.random() * data.length)
+    }
+    return [randomIndex1, randomIndex2]
+  }
+
+  function drawPie(data, index1, index2) {
+    let radius = HEIGHT / 2
+
+    let arc = d3.arc()
+            .outerRadius(radius - 10)
+            .innerRadius(0)
+
+    let pie = d3.pie()
+            .sort(null)
+            .value(function(d) {
+              return d
+            })
+
+    let svg = d3.select("#chart").append("svg")
+            .attr("width", WIDTH)
+            .attr("height", HEIGHT)
+            .append("g")
+            .attr("transform", "translate(" + WIDTH / 2 + "," + HEIGHT / 2 + ")")
+
+    let g = svg.selectAll(".arc")
+            .data(pie(data))
+            .enter().append("g")
+            .attr("class", "arc")
+
+    g.append("path")
+            .attr("d", arc)
+            .style("stroke", "black")
+            .style("fill", "none")
+
+    g.append("circle")
+            .attr("transform", function(d) {
+              d.innerRadius = 0
+              d.outerRadius = radius
+              return "translate(" + arc.centroid(d) + ")"
+            })
+            .attr("fill", "black")
+            .attr("r", function(d) {
+              if (d.index == index1 || d.index == index2) {
+                return 3
+              } else {
+                return 0
+              }
+            })
+  }
+
+  function drawBar(data, index1, index2) {
+    let distance = 20
+    let rectW = (WIDTH - 9 * distance) / 10
+
+    let unitH = HEIGHT / 10;
+
+    let svg = d3.select("#chart").append("svg")
+            .attr("height", HEIGHT)
+            .attr("width", WIDTH)
+            .append("g");
+
+    for (let i = 0; i < data.length; i++) {
+      svg.append('line')
+              .attr('x1', 0)
+              .attr('x2', 800)
+              .attr('y1', HEIGHT)
+              .attr('y2', HEIGHT)
+              .attr('stroke', 'black');
+
+      svg.append('rect')
+              .attr("x", i * (distance + rectW))
+              .attr('y', HEIGHT - unitH * data[i]/10)
+              .attr('height', unitH * data[i]/10)
+              .attr('width', rectW)
+              .attr('stroke', 'black')
+              .attr('stroke-width', 2)
+              .attr('fill', 'none');
+    }
+
+    svg.append('circle')
+            .attr('cx', index1 * (distance + rectW) + rectW / 2)
+            .attr('cy', HEIGHT - unitH * data[index1] / 20)
+            .attr('fill', 'black')
+            .attr('r', '3');
+
+    svg.append('circle')
+            .attr('cx', index2 * (distance + rectW) + rectW / 2)
+            .attr('cy', HEIGHT - unitH * data[index2] / 20)
+            .attr('fill', 'black')
+            .attr('r', '3');
+  }
+
+  function drawTreemap(data, index1, index2) {
+    let Treedata = {
+      "name": "outer",
+      "children": []
+    };
+    for (i = 0; i < 10; i++) {
+      Treedata.children.push({
+        "index": i,
+        "name": "",
+        "value": data[i]
+      });
+    }
+
+    let treemapLayout = d3.treemap().size([WIDTH, HEIGHT]).paddingOuter(0);
+    let root = d3.hierarchy(Treedata);
+    root.sum(function(d) {
+      return d.value
+    });
+    treemapLayout(root);
+
+    let svg = d3.select("#chart").append('svg')
+            .attr("width", WIDTH)
+            .attr("height", HEIGHT)
+            .append("g");
+
+    let nodes = svg.selectAll('g').data(root.descendants()).enter().append('g').attr('transform', function(d) {
+      return 'translate(' + [d.x0, d.y0] + ')'
+    })
+
+    nodes.append('rect').attr('width', function(d) {
+      return d.x1 - d.x0;
+    }).attr('height', function(d) {
+      return d.y1 - d.y0;
+    }).attr("fill", "none")
+            .attr('stroke', 'black')
+            .attr('stroke-width', '2');
+
+    nodes.append('circle').attr('cx', function(d) {
+      return (d.x1 - d.x0) / 2;
+    }).attr('cy', function(d) {
+      return (d.y1 - d.y0) / 2;
+    }).attr('r', 3).attr('fill', function(d) {
+      return (d.data.index == index1 || d.data.index == index2) ? "black" : "none";
+    });
+  }
+
+  function writeCsv(filename) {
+    let csv = "data:text/csv;charset=utf-8,";
+    csv +="type,actual,user input"+"\n";
+
+    for (let i = 0; i < answers.length; i++) {
+      csv += answers[i].join(",")
+      csv += '\n';
+    }
+    let encodedUri = encodeURI(csv);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+  }
 </script>
+</body>
+</html>
+
