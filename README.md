@@ -34,18 +34,22 @@ After 60 questions are done, close page will show. Click close button, csv file 
 
 ## Technical
 
--Using jquery to realize page update.
--Progress alert is updated automatically to let participants know how many questions they have finished.
--Using Adobe Illustrator and Photoshop to make gif for dynamic instruction.
--CSV file is automatically written after each test.
+1.Using jquery to realize page update.
+
+2.Progress alert is updated automatically to let participants know how many questions they have finished.
+
+3.Using Adobe Illustrator and Photoshop to make gif for dynamic instruction.
+
+4.CSV file is automatically written after each test.
 
 ## Design
--Color Scheme
+1.Color Scheme
 
 ![Color](img/Color.png)
 
--Using Source Sans Pro and Myriad Pro fonts on text.
--Hovering effect when hover the buttons.
+2.Using Source Sans Pro and Myriad Pro fonts on text.
+
+3.Hovering effect when hover the buttons.
 
 
 
